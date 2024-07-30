@@ -1,21 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
 function App() {
-  const [city, setCity] = useState ("")
+  const [city, setCity] = useState("");
   const [data, setData] = useState({});
   const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState(""); 
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=-0.1276474&appid=7d1e61ed1b7e4eda1868452f1eca7abb`;
+  const inputRef = useRef(null);
 
-  const searchLocation = (event) => {
-    if (event.key === "Enter") {
-      axios.get(url).then((response) => {
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=7d1e61ed1b7e4eda1868452f1eca7abb`;
+
+  useEffect(() => {
+    if(latitude && longitude)  {
+      searchLocation();
+    }
+  }, [latitude,longitude]);
+
+  const searchLocation = () => {
+    axios.get(url)
+      .then((response) => {
         setData(response.data);
         console.log(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching the weather data:", error);
       });
-      setLatitude("");
-    }
+  };
+
+  const searchCity = () => {
+    const value = inputRef.current.value;
+    if (value === "") return;
+    axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${value}&limit=5&appid=7d1e61ed1b7e4eda1868452f1eca7abb`)
+      .then((response) => {
+        if (response.data.length > 0) {
+          const cityData = response.data[0];
+          setCity(value);
+          setLatitude(cityData.lat);
+          setLongitude(cityData.lon)
+          console.log(cityData);
+        } else {
+          console.error("City not found.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching the city data:", error);
+      });
   };
 
   <head>
@@ -30,25 +60,18 @@ function App() {
       class="w-full h-full absolute text-white bg-gradient-to-r from-cyan-500 to-blue-700"
     >
       <div className="search">
-        <p>Latitude Search:</p>
-        <input
-          value={latitude}
-          onChange={(event) => setLatitude(event.target.value)}
-          onKeyPress={searchLocation}
-          placeholder="Enter latitude"
-          type="text"
-          class="text-black"
-        />
         <p>Location Search:</p>
+
         <input
-          value={city}
-          onChange={(event) => setLatitude(event.target.value)}
-          onKeyPress={searchLocation}
-          placeholder="Enter City"
-          type="text"
-          class="text-black"
-        >
-        </input>
+        type="text"
+        ref={inputRef}
+        placeholder="Enter city name"
+        class="text-black"
+      />
+      <button onClick={searchCity}>Search City</button>
+
+
+
       </div>
       <div
         className="container"
