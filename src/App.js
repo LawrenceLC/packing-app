@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import WEATHER_API_KEY from "./apikey";
+
 
 function App() {
   const [city, setCity] = useState("");
@@ -9,7 +11,7 @@ function App() {
 
   const inputRef = useRef(null);
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=7d1e61ed1b7e4eda1868452f1eca7abb`;
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}`;
 
   useEffect(() => {
     if(latitude && longitude)  {
@@ -31,7 +33,7 @@ function App() {
   const searchCity = () => {
     const value = inputRef.current.value;
     if (value === "") return;
-    axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${value}&limit=5&appid=7d1e61ed1b7e4eda1868452f1eca7abb`)
+    axios.get(`http://api.openweathermap.org/geo/1.0/direct?q=${value}&limit=5&appid=${WEATHER_API_KEY}`)
       .then((response) => {
         if (response.data.length > 0) {
           const cityData = response.data[0];
@@ -61,7 +63,7 @@ function App() {
     >
       <div className="search">
         <p>Location Search:</p>
-
+        
         <input
         type="text"
         ref={inputRef}
