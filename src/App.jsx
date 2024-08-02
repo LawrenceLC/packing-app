@@ -21,8 +21,15 @@ function App() {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [weatherorforecast, setWeatherOrForecast] = useState("");
+  const [requests, setRequests] = useState(0);
 
   const inputRef = useRef(null);
+
+  function resetState() {
+    setLatitude("");
+    setLongitude("");
+    setWeatherOrForecast("");
+  }
 
   const url = `https://api.openweathermap.org/data/2.5/${weatherorforecast}?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}`;
 
@@ -30,19 +37,17 @@ function App() {
     if (latitude && longitude) {
       searchLocation();
     }
-  }, [latitude, longitude]);
+  }, [requests]);
 
   const handleWeatherClick = () => {
-    setData({});
-    setWeatherOrForecast("");
+    resetState();
     setWeatherOrForecast("weather");
     searchCity();
     console.log("---Weather Button Clicked");
   };
 
   const handleForecastClick = () => {
-    setData({});
-    setWeatherOrForecast("");
+    resetState();
     setWeatherOrForecast("forecast");
     searchCity();
     console.log("---Forecast Button Clicked");
@@ -65,7 +70,7 @@ function App() {
 
   const searchCity = () => {
     const value = inputRef.current.value;
-    if (value === "") return
+    if (value === "") return;
     axios
       .get(
         `http://api.openweathermap.org/geo/1.0/direct?q=${value}&limit=5&appid=${WEATHER_API_KEY}`
@@ -77,6 +82,7 @@ function App() {
           setLongitude(cityData.lon);
           console.log("City Coordinate API Data from searchCity:");
           console.log(cityData);
+          setRequests(requests + 1);
         } else {
           console.error("City not found.");
         }
