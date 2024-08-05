@@ -29,6 +29,7 @@ function App() {
     setLatitude("");
     setLongitude("");
     setWeatherOrForecast("");
+    //Triggers an unessential re-render, fix later
   }
 
   const url = `https://api.openweathermap.org/data/2.5/${weatherorforecast}?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}`;
