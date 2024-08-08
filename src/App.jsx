@@ -101,8 +101,7 @@ function App() {
 
   return (
     <div
-      className="app"
-      class="w-full h-full absolute text-white bg-gradient-to-r from-cyan-500 to-blue-700"
+      class="w-full h-full absolute text-white bg-gradient-to-r from-cyan-500 to-blue-700 overflow-y-auto"
     >
       <div className="search">
         <p>Location Search:</p>
@@ -131,7 +130,9 @@ function App() {
         <Suspense fallback={<h1>Loading Forecast...</h1>}>
           <ForecastPage data={data} />
         </Suspense>
+        
       )}
+      <div><h4>Icons designed by Slidicon & Eucalyp from Flaticon</h4></div>
     </div>
   );
 }
