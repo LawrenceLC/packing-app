@@ -75,7 +75,8 @@ const ForecastPage = ({ data }) => {
   function findArrayItemsTillTomorrow(data) {
     let k = 0;
     for (let i = 0; i < 8; i++) {
-      if (getDay(data, i) != getDay(data, 0)) {
+      const today = getDay(data, 0);
+      if (data.list[i].dt_txt.slice(8,10) === today) {
         k++;
       }
     }
@@ -87,7 +88,7 @@ const ForecastPage = ({ data }) => {
     const k = (day * 8) + itemsTillTomorrow;
     let items = [];
     for (let i = 0; i < 9; i++) {
-      if (i === 3 || i === 5 || i === 7) {
+      if (i === 2 || i === 4 || i === 6) {
         items.push(k + i);
       }
     }
@@ -115,8 +116,7 @@ const ForecastPage = ({ data }) => {
     return recomendation;
   }
 
-  function getBottomTimePackingReccomendation(data, timeIndex) {
-    const feelsLike = getFeelsLike(data, timeIndex);
+  function getBottomScale(feelsLike) {
     if (feelsLike <= 0) {
       return "Thermal leggings";
     } else if (feelsLike <= 25) {
@@ -124,6 +124,12 @@ const ForecastPage = ({ data }) => {
     } else {
       return "Shorts";
     }
+  }
+
+  function getBottomTimePackingReccomendation(data, timeIndex) {
+    const feelsLike = getFeelsLike(data, timeIndex);
+    const recomendation = getBottomScale(feelsLike);
+    return recomendation;
   }
 
   function getInnerScale(feelsLike) {
@@ -236,7 +242,7 @@ const ForecastPage = ({ data }) => {
   const renderOuterClothing = (allDayTemps) => {
     const outer = getOuterScale(Math.min(...allDayTemps));
     if (outer === "🚫") {
-      return "🚫";
+      return "";
     } else if (outer === "Jumper") {
       return <img src={icons.jumper} alt="Jumper" />;
     } else if (outer === "Jacket") {
@@ -245,6 +251,39 @@ const ForecastPage = ({ data }) => {
       return <img src={icons.coat} alt="Coat" />;
     } else return "error";
   };
+
+  const renderBottomClothing = (allDayTemps) => {
+    const bottom = getBottomScale(allDayTemps.reduce((acc, v) => acc + v, 0) / allDayTemps.length);
+    if (bottom === "Shorts") {
+      return <img src={icons.shorts} alt="Shorts" />;
+    } else if (bottom === "Trousers") {
+      return <img src={icons.trousers} alt="Trousers" />;
+    } else if (bottom === "Thermal leggings") {
+      return <img src={icons.thermalUnderwear} alt="thermalUnderwear" />;
+    } else return "error";
+  };
+///
+  
+const getUmbrellaNeeded = (data, items) => {
+  for (let item of items) {
+    const rain = data.list[item].rain;
+    if (rain && rain["3h"] > 0.5) {
+      return "✅";
+    }
+  }
+  return "❌";
+};
+
+const getSunglassesNeeded = (data, items) => {
+  for (let item of items) {
+    let weatherCondition = data.list[item].weather[0].description;
+    console.log(weatherCondition);
+    if (weatherCondition === "clear sky" || weatherCondition === "few clouds" || weatherCondition === "scattered clouds") {
+      return "✅";
+    }
+  }
+  return "❌";
+}
 
 ///
   const timePackingReccomendation = (data, timeIndex) => {
@@ -263,7 +302,7 @@ const ForecastPage = ({ data }) => {
   const renderForecast = (day) => {
     const items = findArrayItemsForDay(day);
     return (
-      <div className="max-w-5xl  m-auto">
+      <div className="max-w-5xl  m-auto min-h-44">
         <h2>
           {getMonth(data, items[0])} {getDay(data, items[0])}
         </h2>
@@ -284,11 +323,12 @@ const ForecastPage = ({ data }) => {
               className="inline-flex [&_*]:outline flex-row mr-3 mb-2"
               key={index}
             >
-              <div className="">
+              <div className="w-28">
                 <p className="min-w-20">{getTime(data, item)}</p>
                 <p>{getTemperature(data, item)}°C </p>
                 <p>{getHumidity(data, item)}% </p>
                 <p>{getWindSpeedDescription(data, item)}</p>
+                <p>{getWeatherCondition(data, item)}</p>
               </div>
               <div>
                 <p className="w-24">{timePackingReccomendation(data, item)}</p>
@@ -296,15 +336,15 @@ const ForecastPage = ({ data }) => {
             </div>
           ))}
         </div>
-        <div className="min-w-32 max-w-36 h-full flex">
+        <div className="min-w-32 max-w-36 max-h-32 h-full flex m-auto">
           <div className="grid grid-rows-2 grid-cols-2 items-center">
             <div>{renderInnerClothing(allDayTemps)}</div>
             <div>{renderOuterClothing(allDayTemps)}</div>
-            <div>Bottom</div>
+            <div>{renderBottomClothing(allDayTemps)}</div>
             <div>
               <div className="items-center">
-                <div>Umbrella?</div>
-                <div>Sunglasses?</div>
+                <div>Umbrella{getUmbrellaNeeded(data, items)}</div>
+                <div>Sunglasses{getSunglassesNeeded(data, items)}</div>
               </div>
             </div>
           </div>
