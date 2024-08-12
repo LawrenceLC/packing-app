@@ -76,7 +76,7 @@ const ForecastPage = ({ data }) => {
     let k = 0;
     for (let i = 0; i < 8; i++) {
       const today = getDay(data, 0);
-      if (data.list[i].dt_txt.slice(8,10) === today) {
+      if (data.list[i].dt_txt.slice(8, 10) === today) {
         k++;
       }
     }
@@ -85,7 +85,7 @@ const ForecastPage = ({ data }) => {
 
   function findArrayItemsForDay(day) {
     let itemsTillTomorrow = findArrayItemsTillTomorrow(data);
-    const k = (day * 8) + itemsTillTomorrow;
+    const k = day * 8 + itemsTillTomorrow;
     let items = [];
     for (let i = 0; i < 9; i++) {
       if (i === 2 || i === 4 || i === 6) {
@@ -104,9 +104,9 @@ const ForecastPage = ({ data }) => {
     } else if (feelsLike <= 23) {
       return "Jumper";
     } else if (feelsLike <= 27) {
-      return "🚫";
+      return "No jacket";
     } else {
-      return "🚫";
+      return "No jacket";
     }
   }
 
@@ -249,11 +249,13 @@ const ForecastPage = ({ data }) => {
       return <img src={icons.sweatshirt} alt="Jacket" />;
     } else if (outer === "Winter coat") {
       return <img src={icons.coat} alt="Coat" />;
-    } else return "error";
+    } else return " ";
   };
 
   const renderBottomClothing = (allDayTemps) => {
-    const bottom = getBottomScale(allDayTemps.reduce((acc, v) => acc + v, 0) / allDayTemps.length);
+    const bottom = getBottomScale(
+      allDayTemps.reduce((acc, v) => acc + v, 0) / allDayTemps.length
+    );
     if (bottom === "Shorts") {
       return <img src={icons.shorts} alt="Shorts" />;
     } else if (bottom === "Trousers") {
@@ -262,39 +264,41 @@ const ForecastPage = ({ data }) => {
       return <img src={icons.thermalUnderwear} alt="thermalUnderwear" />;
     } else return "error";
   };
-///
-  
-const getUmbrellaNeeded = (data, items) => {
-  for (let item of items) {
-    const rain = data.list[item].rain;
-    if (rain && rain["3h"] > 0.5) {
-      return "✅";
-    }
-  }
-  return "❌";
-};
+  ///
 
-const getSunglassesNeeded = (data, items) => {
-  for (let item of items) {
-    let weatherCondition = data.list[item].weather[0].description;
-    console.log(weatherCondition);
-    if (weatherCondition === "clear sky" || weatherCondition === "few clouds" || weatherCondition === "scattered clouds") {
-      return "✅";
+  const getUmbrellaNeeded = (data, items) => {
+    for (let item of items) {
+      const rain = data.list[item].rain;
+      if (rain && rain["3h"] > 0.5) {
+        return "✅";
+      }
     }
-  }
-  return "❌";
-}
+    return "❌";
+  };
 
-///
+  const getSunglassesNeeded = (data, items) => {
+    for (let item of items) {
+      let weatherCondition = data.list[item].weather[0].description;
+      console.log(weatherCondition);
+      if (
+        weatherCondition === "clear sky" ||
+        weatherCondition === "few clouds" ||
+        weatherCondition === "scattered clouds"
+      ) {
+        return "✅";
+      }
+    }
+    return "❌";
+  };
+
+  ///
   const timePackingReccomendation = (data, timeIndex) => {
     const feelsLike = getFeelsLike(data, timeIndex);
     return (
       <div>
-        <p>{feelsLike.toFixed(1)}°C</p>
         <p>{getInnerTimePackingReccomendation(data, timeIndex)}</p>
         <p>{getOuterTimePackingReccomendation(data, timeIndex)}</p>
         <p>{getBottomTimePackingReccomendation(data, timeIndex)}</p>
-        <p></p>
       </div>
     );
   };
@@ -302,12 +306,12 @@ const getSunglassesNeeded = (data, items) => {
   const renderForecast = (day) => {
     const items = findArrayItemsForDay(day);
     return (
-      <div className="max-w-5xl  m-auto min-h-44">
+      <div className="m-auto">
         <h2>
-          {getMonth(data, items[0])} {getDay(data, items[0])}
+        📅{getMonth(data, items[0])} {getDay(data, items[0])}
         </h2>
-        <div className="flex ">
-          <div className="flex">{renderForecastTimes(items, day)}</div>
+        <div className="">
+          <div className="">{renderForecastTimes(items, day)}</div>
         </div>
       </div>
     );
@@ -316,35 +320,39 @@ const getSunglassesNeeded = (data, items) => {
   const renderForecastTimes = (items, day) => {
     const allDayTemps = getAllDayFeelsLike(day);
     return (
-      <div className="flex flex-row items-start">
-        <div className="w-fit">
+      <div className="inline-flex flex-row justify-start items-start mb-7">
+        <div className="inline-flex flex-wrap justify-around ">
           {items.map((item, index) => (
             <div
-              className="inline-flex [&_*]:outline flex-row mr-3 mb-2"
+              className="border-2 rounded mr-2 mb-2 flex-col min-w-48 max-w-64 grow"
               key={index}
             >
-              <div className="w-28">
-                <p className="min-w-20">{getTime(data, item)}</p>
-                <p>{getTemperature(data, item)}°C </p>
-                <p>{getHumidity(data, item)}% </p>
-                <p>{getWindSpeedDescription(data, item)}</p>
-                <p>{getWeatherCondition(data, item)}</p>
+              <div className="text-center">
+                <p className="border-b-2">{getTime(data, item)}</p>
+                <p>Feels like {getFeelsLike(data, item).toFixed(1)} °C</p>
+                <p className="border-b-2">{getWeatherCondition(data, item)}</p>
               </div>
-              <div>
-                <p className="w-24">{timePackingReccomendation(data, item)}</p>
+              <div className="flex flex-row">
+                <div className="grow border-r-2">
+                  <p>{getHumidity(data, item)}% Humidity</p>
+                  <p>{getWindSpeedDescription(data, item)}</p>
+                </div>
+                <div className="grow">
+                  <p className="">{timePackingReccomendation(data, item)}</p>
+                </div>
               </div>
             </div>
           ))}
         </div>
-        <div className="min-w-32 max-w-36 max-h-32 h-full flex m-auto">
-          <div className="grid grid-rows-2 grid-cols-2 items-center">
+        <div className="min-w-32 max-w-36 max-h-32 h-full flex mt-auto mb-auto">
+          <div className="grid grow grid-rows-2 grid-cols-2 items-center ">
             <div>{renderInnerClothing(allDayTemps)}</div>
             <div>{renderOuterClothing(allDayTemps)}</div>
             <div>{renderBottomClothing(allDayTemps)}</div>
             <div>
               <div className="items-center">
-                <div>Umbrella{getUmbrellaNeeded(data, items)}</div>
-                <div>Sunglasses{getSunglassesNeeded(data, items)}</div>
+                <div>☂️?{getUmbrellaNeeded(data, items)}</div>
+                <div>🕶️?{getSunglassesNeeded(data, items)}</div>
               </div>
             </div>
           </div>
@@ -358,8 +366,8 @@ const getSunglassesNeeded = (data, items) => {
   }
 
   return (
-    <div className="m-auto max-w-5xl w-4/5">
-      <h1>5 Day Forecast</h1>
+    <div className="">
+      <h1 className="mb-7">4 Day Forecast</h1>
       {renderForecast(0)}
       {renderForecast(1)}
       {renderForecast(2)}

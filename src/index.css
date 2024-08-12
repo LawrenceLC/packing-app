@@ -7,7 +7,7 @@
 }
 
 p {
-  @apply text-2xl
+  @apply leading-6
 }
 
 h1{

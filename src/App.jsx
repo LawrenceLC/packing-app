@@ -100,39 +100,47 @@ function App() {
   </head>;
 
   return (
-    <div
-      class="w-full h-full absolute text-white bg-gradient-to-r from-cyan-500 to-blue-700 overflow-y-auto"
-    >
-      <div className="search">
-        <p>Location Search:</p>
+    <div class=" flex flex-col w-full h-full min-h-screen absolute text-white bg-gradient-to-r from-cyan-500 to-blue-700 overflow-y-auto">
+      <header className="bg-blue-800 bg-opacity-25 mb-8 ">
+        <div className="  " >
+          <div className=" ml-auto mr-auto mt-5 mb-6 max-w-5xl w-4/5 ">
+            <input
+              type="text"
+              ref={inputRef}
+              placeholder="City name"
+              class="text-black rounded-full h-9 border-none mr-3"
+            />
+            <button
+              onClick={handleWeatherClick}
+              className="border-2 inline-block rounded-full h-9 mr-3"
+            >
+              Current Weather 🔍
+            </button>
+            <button
+              onClick={handleForecastClick}
+              className="border-2 inline-block rounded-full h-9"
+            >
+              Forecast 🔍
+            </button>
+          </div>
+        </div>
+        </header>
+      <div className=" grow ml-auto mr-auto max-w-5xl w-4/5 align-middle mb-8">
 
-        <input
-          type="text"
-          ref={inputRef}
-          placeholder="Enter city name"
-          class="text-black"
-        />
-        <br></br>
-        <button onClick={handleWeatherClick} className="border-4">
-          Current Weather
-        </button>
-        <br></br>
-        <button onClick={handleForecastClick} className="border-4">
-          5-Day Forecast
-        </button>
+        {weatherorforecast === "weather" && (
+          <Suspense fallback={<h1>Loading Weather...</h1>}>
+            <WeatherPage data={data} />
+          </Suspense>
+        )}
+        {weatherorforecast === "forecast" && (
+          <Suspense fallback={<h1>Loading Forecast...</h1>}>
+            <ForecastPage data={data} />
+          </Suspense>
+        )}
       </div>
-      {weatherorforecast === "weather" && (
-        <Suspense fallback={<h1>Loading Weather...</h1>}>
-          <WeatherPage data={data} />
-        </Suspense>
-      )}
-      {weatherorforecast === "forecast" && (
-        <Suspense fallback={<h1>Loading Forecast...</h1>}>
-          <ForecastPage data={data} />
-        </Suspense>
-        
-      )}
-      <div><h4>Icons designed by Slidicon & Eucalyp from Flaticon</h4></div>
+      <footer className="bottom-0 left-0 w-screen bg-blue-800 bg-opacity-25 z-10 ">
+        <h4>Icons designed by Slidicon & Eucalyp from Flaticon</h4>
+      </footer>
     </div>
   );
 }
