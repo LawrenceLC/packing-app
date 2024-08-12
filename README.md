@@ -1,4 +1,4 @@
-#About
+# About
 
 ### Getting Started with Packing-App
 
